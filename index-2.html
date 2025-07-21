@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual Acuity Converter</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; background-color: #f7f7f7; }
+    h1 { color: #333; }
+    label, input, button { display: block; margin: 10px 0; }
+    .resultado { background: #fff; padding: 15px; border-radius: 8px; margin-top: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <h1>Visual Acuity Converter</h1>
+  <label for="visionInput">Enter visual acuity (Snellen format, e.g., 10/100)</label>
+  <input type="text" id="visionInput" placeholder="e.g., 10/100">
+
+  <label for="letrasInput">Letters additionally read (+) or missed (−)</label>
+  <input type="number" id="letrasInput" placeholder="e.g., -2 or +1">
+
+  <button onclick="convertirAgudeza()">Convert</button>
+
+  <div class="resultado" id="resultado" style="display: none;"></div>
+
+  <script>
+    function convertirAgudeza() {
+      const input = document.getElementById('visionInput').value;
+      const letrasExtra = parseInt(document.getElementById('letrasInput').value) || 0;
+      const resultado = document.getElementById('resultado');
+
+      const partes = input.split('/');
+      if (partes.length !== 2 || isNaN(partes[0]) || isNaN(partes[1])) {
+        resultado.innerHTML = "Please enter a valid value (e.g., 10/100).";
+        resultado.style.display = 'block';
+        return;
+      }
+
+      const numerador = parseFloat(partes[0]);
+      const denominador = parseFloat(partes[1]);
+      const decimal = numerador / denominador;
+
+      let logMAR = -(Math.log10(decimal));
+      logMAR += letrasExtra * 0.02;
+
+      const MAR = (1 / decimal).toFixed(2);
+      const snellen20 = `20/${Math.round((denominador * 20) / numerador)}`;
+      const snellen6 = `6/${Math.round((denominador * 6) / numerador)}`;
+
+      resultado.innerHTML = `
+        <strong>Results:</strong><br>
+        • Decimal: ${decimal.toFixed(2)}<br>
+        • logMAR: ${logMAR.toFixed(2)}<br>
+        • MAR: ${MAR}<br>
+        • Snellen (20 ft): ${snellen20}<br>
+        • Snellen (6 m): ${snellen6}<br>
+        • Extra letters: ${letrasExtra > 0 ? '+' + letrasExtra : letrasExtra}
+      `;
+      resultado.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
